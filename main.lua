@@ -1,5 +1,5 @@
--- // Wellon Hub Loader
--- // Modified for Wellon project
+-- // Made by @Flames9925 | Edited by @NyxaSylph
+-- // Wellon Hub | redoxin42-bit Edition
 
 local cloneref = (cloneref or clonereference or function(instance)
     return instance
@@ -11,7 +11,7 @@ local LPlayer = Players.LocalPlayer
 
 repeat task.wait() until game:IsLoaded() and LPlayer
 
--- Анти-АФК система (чтобы не кикало)
+-- Анти-АФК система
 LPlayer.Idled:Connect(function()
     pcall(function()
         VirtualUser:CaptureController()
@@ -19,10 +19,10 @@ LPlayer.Idled:Connect(function()
     end)
 end)
 
-local WellonLoader = {}
+local WellonHub = {}
 
--- Список игр и путей к файлам
-WellonLoader.Files = {
+-- Список поддерживаемых игр и пути к ним
+WellonHub.Files = {
     ["Bizzare Lineage"] = {
         File = "BA/Main.lua",
         CreatorId = 33161040
@@ -37,33 +37,36 @@ WellonLoader.Files = {
     }
 }
 
-function WellonLoader:LoadByCreatorId(CreatorId)
+function WellonHub:LoadByCreatorId(CreatorId)
     for GameName, Data in pairs(self.Files) do
         if Data.CreatorId == CreatorId then
-            
-            -- Ссылка на исходный код (теперь под брендом Wellon)
+            -- Используем оригинальный источник, но под брендом Wellon
             local Url = "https://raw.githubusercontent.com/NyxaSylph/Vellure/main/" .. Data.File
             
             local Success, Result = pcall(function()
-                -- Загружаем основной скрипт
                 return loadstring(game:HttpGet(Url))()
             end)
 
             if Success then
                 -- Вывод в консоль уже с твоим названием
                 print("✅ Wellon Hub Loaded:", GameName)
+                
+                -- Уведомление в игре
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "Wellon Hub",
+                    Text = GameName .. " успешно загружен!",
+                    Duration = 5
+                })
             else
                 warn("❌ Wellon Load failed:", Result)
             end
-
             return
         end
     end
-
-    warn("WELLON HUB: UNSUPPORTED GAME 🤡")
+    warn("WELLON HUB: UNSUPPORTED GAME")
 end
 
 -- Запуск загрузчика по ID игры
-WellonLoader:LoadByCreatorId(game.CreatorId)
+WellonHub:LoadByCreatorId(game.CreatorId)
 
-return WellonLoader
+return WellonHub
