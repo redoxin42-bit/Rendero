@@ -1,5 +1,5 @@
--- // Wellon Hub | redoxin42-bit Edition
--- // Made by @Flames9925 | Edited by @NyxaSylph
+-- // Wellon Hub | Official Loader
+-- // Исправлено специально для redoxin42-bit
 
 local cloneref = (cloneref or clonereference or function(instance) return instance end)
 local Players = cloneref(game:GetService("Players"))
@@ -8,7 +8,7 @@ local LPlayer = Players.LocalPlayer
 
 repeat task.wait() until game:IsLoaded() and LPlayer
 
--- Анти-АФК система
+-- Анти-АФК
 LPlayer.Idled:Connect(function()
     pcall(function()
         VirtualUser:CaptureController()
@@ -16,14 +16,13 @@ LPlayer.Idled:Connect(function()
     end)
 end)
 
--- ФУНКЦИЯ ДЛЯ ЗАМЕНЫ ТЕКСТА В МЕНЮ (WELLON)
-local function ApplyWellonBranding()
+-- ЭТОТ БЛОК МЕНЯЕТ ТЕКСТ В КРАСНЫХ КРУЖОЧКАХ
+local function ForceWellonBranding()
     task.spawn(function()
-        while task.wait(1) do
-            -- Ищем все объекты, где может быть написано Vellure
+        while task.wait(0.5) do -- Проверяем каждые полсекунды
             for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
                 if v:IsA("TextLabel") or v:IsA("TextButton") then
-                    -- Меняем Vellure на Wellon в верхней кнопке и внизу
+                    -- Если находим старое название, заменяем на Wellon
                     if v.Text:find("Vellure") then
                         v.Text = v.Text:gsub("Vellure", "Wellon")
                     end
@@ -33,15 +32,15 @@ local function ApplyWellonBranding()
     end)
 end
 
-local WellonHub = {}
+local Wellon = {}
 
-WellonHub.Files = {
+Wellon.Files = {
     ["Bizzare Lineage"] = { File = "BA/Main.lua", CreatorId = 33161040 },
     ["A Universal Time"] = { File = "AUT/Main.lua", CreatorId = 6556072 },
     ["Sailor Piece"] = { File = "SP/Main.lua", CreatorId = 1002185259 }
 }
 
-function WellonHub:LoadByCreatorId(CreatorId)
+function Wellon:LoadByCreatorId(CreatorId)
     for GameName, Data in pairs(self.Files) do
         if Data.CreatorId == CreatorId then
             local Url = "https://raw.githubusercontent.com/NyxaSylph/Vellure/main/" .. Data.File
@@ -51,16 +50,15 @@ function WellonHub:LoadByCreatorId(CreatorId)
             end)
 
             if Success then
-                print("✅ Wellon Hub Loaded:", GameName)
-                ApplyWellonBranding() -- Запускаем подмену текста после загрузки
+                print("✅ Wellon Hub: Успешно загружено!") --
+                ForceWellonBranding() -- ЗАПУСКАЕМ ИСПРАВЛЕНИЕ НАЗВАНИЙ
             else
-                warn("❌ Wellon Load failed:", Result)
+                warn("❌ Wellon Hub: Ошибка загрузки")
             end
             return
         end
     end
-    warn("WELLON HUB: UNSUPPORTED GAME")
 end
 
-WellonHub:LoadByCreatorId(game.CreatorId)
-return WellonHub
+Wellon:LoadByCreatorId(game.CreatorId)
+return Wellon
