@@ -1,13 +1,12 @@
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 
 local ScreenGui = Instance.new("ScreenGui", Player.PlayerGui)
-ScreenGui.Name = "WellonHub_Elite_v3"
+ScreenGui.Name = "WellonHub_Final"
 ScreenGui.ResetOnSpawn = false
 
--- Функция для перетаскивания (сделает всё подвижным)
+-- Функция для перетаскивания основного меню и кнопки
 local function MakeDraggable(obj)
     local dragging, dragInput, dragStart, startPos
     obj.InputBegan:Connect(function(input)
@@ -30,149 +29,96 @@ local function MakeDraggable(obj)
     end)
 end
 
--- 1. ВЕРХНЯЯ КНОПКА УПРАВЛЕНИЯ (Wellon CLOSE / OPEN)
+-- 1. ВЕРХНЯЯ ПАНЕЛЬ (Wellon CLOSE)
 local TopBar = Instance.new("Frame", ScreenGui)
-TopBar.Size = UDim2.new(0, 150, 0, 32)
-TopBar.Position = UDim2.new(0.5, -75, 0, 15) -- Сверху по центру как на видео
-TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+TopBar.Size = UDim2.new(0, 160, 0, 35)
+TopBar.Position = UDim2.new(0.5, -80, 0, 10)
+TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 6)
 local TopStroke = Instance.new("UIStroke", TopBar)
-TopStroke.Color = Color3.fromRGB(80, 50, 150) -- Фиолетовая обводка
-TopStroke.Thickness = 1.5
+TopStroke.Color = Color3.fromRGB(60, 60, 75)
 MakeDraggable(TopBar)
 
 local TopBtn = Instance.new("TextButton", TopBar)
 TopBtn.Size = UDim2.new(1, 0, 1, 0)
 TopBtn.BackgroundTransparency = 1
-TopBtn.Text = "Wellon CLOSE"
+TopBtn.Text = "Wellon CLOSE" --
 TopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 TopBtn.Font = Enum.Font.GothamBold
-TopBtn.TextSize = 12
+TopBtn.TextSize = 13
 
--- 2. ГЛАВНОЕ МЕНЮ (Фиолетовая тема)
+-- 2. ГЛАВНОЕ ОКНО
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0, 580, 0, 390)
-Main.Position = UDim2.new(0.5, -290, 0.5, -195)
-Main.BackgroundColor3 = Color3.fromRGB(13, 13, 17)
-Main.BorderSizePixel = 0
+Main.Size = UDim2.new(0, 600, 0, 380)
+Main.Position = UDim2.new(0.5, -300, 0.5, -190)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
-local MainStroke = Instance.new("UIStroke", Main)
-MainStroke.Color = Color3.fromRGB(45, 45, 55)
-MainStroke.Thickness = 1.5
-MakeDraggable(Main) -- Меню тоже можно таскать!
+MakeDraggable(Main)
 
--- Сайдбар с иконками
+-- Сайдбар (Слева)
 local Sidebar = Instance.new("Frame", Main)
-Sidebar.Size = UDim2.new(0, 55, 1, 0)
-Sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
+Sidebar.Size = UDim2.new(0, 50, 1, 0)
+Sidebar.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Instance.new("UICorner", Sidebar)
 
--- Список вкладок (Просто placeholder для структуры)
-local TabList = Instance.new("UIListLayout", Sidebar)
-TabList.Padding = UDim.new(0, 15)
-TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
--- Заголовок
-local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1, -70, 0, 35)
-Title.Position = UDim2.new(0, 65, 0, 5)
-Title.Text = "Main | Bizarre Lineage"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.BackgroundTransparency = 1
-
--- Контейнер для скроллинга функций (Dropdowns)
+-- Контент (Справа)
 local Scroll = Instance.new("ScrollingFrame", Main)
-Scroll.Size = UDim2.new(1, -80, 1, -70)
-Scroll.Position = UDim2.new(0, 70, 0, 45)
+Scroll.Size = UDim2.new(1, -70, 1, -60)
+Scroll.Position = UDim2.new(0, 60, 0, 40)
 Scroll.BackgroundTransparency = 1
 Scroll.ScrollBarThickness = 2
-Scroll.ScrollBarImageColor3 = Color3.fromRGB(80, 50, 150) -- Фиолетовый скролл
-local ContentList = Instance.new("UIListLayout", Scroll)
-ContentList.Padding = UDim.new(0, 10)
+local List = Instance.new("UIListLayout", Scroll)
+List.Padding = UDim.new(0, 8)
 
--- 3. СОЗДАНИЕ СЕКЦИЙ (АККОРДЕОНЫ)
-local function NewAccordion(name, items)
-    local AccFrame = Instance.new("Frame", Scroll)
-    AccFrame.Size = UDim2.new(1, -10, 0, 40)
-    AccFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
-    AccFrame.ClipsDescendants = true
-    Instance.new("UICorner", AccFrame)
+-- Функция для разделов (Dropdowns)
+local function NewSection(name, items)
+    local Frame = Instance.new("Frame", Scroll)
+    Frame.Size = UDim2.new(1, -10, 0, 35)
+    Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    Frame.ClipsDescendants = true
+    Instance.new("UICorner", Frame)
 
-    local Head = Instance.new("TextButton", AccFrame)
-    Head.Size = UDim2.new(1, 0, 0, 40)
-    Head.BackgroundTransparency = 1
-    Head.Text = "  " .. name .. "  ▼"
-    Head.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Head.Font = Enum.Font.GothamBold
-    Head.TextXAlignment = Enum.TextXAlignment.Left
+    local btn = Instance.new("TextButton", Frame)
+    btn.Size = UDim2.new(1, 0, 0, 35)
+    btn.BackgroundTransparency = 1
+    btn.Text = "  " .. name .. "  ▼"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Font = Enum.Font.GothamBold
 
-    local IsOpen = false
-    Head.MouseButton1Click:Connect(function()
-        IsOpen = not IsOpen
-        AccFrame:TweenSize(IsOpen and UDim2.new(1, -10, 0, 40 + (#items * 35)) or UDim2.new(1, -10, 0, 40), "Out", "Quad", 0.3, true)
+    local open = false
+    btn.MouseButton1Click:Connect(function()
+        open = not open
+        Frame:TweenSize(open and UDim2.new(1, -10, 0, 35 + (#items * 35)) or UDim2.new(1, -10, 0, 35), "Out", "Quad", 0.3, true)
     end)
 
-    for i, itemText in ipairs(items) do
-        local Row = Instance.new("Frame", AccFrame)
-        Row.Size = UDim2.new(1, -10, 0, 30)
-        Row.Position = UDim2.new(0, 5, 0, 40 + (i-1)*35)
-        Row.BackgroundTransparency = 1
-        
-        local Label = Instance.new("TextLabel", Row)
-        Label.Size = UDim2.new(0.8, 0, 1, 0)
-        Label.Text = itemText
-        Label.TextColor3 = Color3.fromRGB(180, 180, 190)
-        Label.BackgroundTransparency = 1
-        Label.TextXAlignment = Enum.TextXAlignment.Left
-        Label.Font = Enum.Font.Gotham
-
-        local Toggle = Instance.new("TextButton", Row)
-        Toggle.Size = UDim2.new(0, 35, 0, 18)
-        Toggle.Position = UDim2.new(0.85, 0, 0.2, 0)
-        Toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 50) -- Цвет выключенной кнопки
-        Toggle.Text = ""
-        Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1, 0)
-
-        local State = false
-        Toggle.MouseButton1Click:Connect(function()
-            State = not State
-            -- Кнопка «загорается» фиолетовым при включении
-            Toggle.BackgroundColor3 = State and Color3.fromRGB(80, 50, 150) or Color3.fromRGB(40, 40, 50)
-            print("WELLON HUB | " .. itemText .. " toggled: " .. (State and "ON" or "OFF"))
-        end)
+    for i, text in ipairs(items) do
+        local opt = Instance.new("TextButton", Frame)
+        opt.Size = UDim2.new(1, -10, 0, 30)
+        opt.Position = UDim2.new(0, 5, 0, 35 + (i-1)*35)
+        opt.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+        opt.Text = text
+        opt.TextColor3 = Color3.fromRGB(180, 180, 180)
+        Instance.new("UICorner", opt)
     end
 end
 
--- 4. НАПОЛНЕНИЕ ПО КАТЕГОРИЯМ
-NewAccordion("Automation", {
-    "Auto Mission", "Auto-PVP Mission [MAIN]", "Auto-PVP Mission [ALT]", 
-    "Auto Meditation", "Auto Gang Contract", "Auto Prestige", "Auto World Event"
-})
+-- Наполнение секций
+NewSection("Automation", {"Auto Mission", "Auto Meditation", "Auto Prestige", "Auto World Event"})
+NewSection("Skills", {"Auto Skills (R,Z,X,C,V,E)", "Main Skills", "Sub Abilities"})
+NewSection("Raids", {"Auto Raid (UnderMap)", "Auto Raid (Above)", "Auto Play Again"})
+NewSection("Player ESP", {"Enable ESP", "Healthbar", "Boxes", "Name", "Distance"}) --
 
-NewAccordion("Skills", {
-    "Auto Skills (R,Z,X,C,V,E)", "Main Skills", "Sub Abilities", "Fighting Ability"
-})
-
-NewAccordion("Raids & Bosses", {
-    "Auto Raid (UnderMap)", "Auto Raid (Above)", "Auto Play Again", "Auto Boss Farm"
-})
-
-NewAccordion("Player ESP", {
-    "Enable Player ESP", "Healthbar", "Names", "Stands", "Distance"
-})
-
--- Нижняя инфо-панель
+-- Инфо панель внизу
 local BottomInfo = Instance.new("TextLabel", Main)
-BottomInfo.Size = UDim2.new(0, 200, 0, 20)
-BottomInfo.Position = UDim2.new(1, -210, 1, -25)
-BottomInfo.Text = "Wellon | Build 2.0 | 61 FPS"
-BottomInfo.TextColor3 = Color3.fromRGB(80, 80, 100)
+BottomInfo.Size = UDim2.new(1, -20, 0, 20)
+BottomInfo.Position = UDim2.new(0, 10, 1, -25)
+BottomInfo.Text = "Wellon | Build 2.0 | 60 FPS" --
+BottomInfo.TextColor3 = Color3.fromRGB(100, 100, 110)
+BottomInfo.TextXAlignment = Enum.TextXAlignment.Right
 BottomInfo.BackgroundTransparency = 1
-BottomInfo.Font = Enum.Font.Gotham
 
--- Логика кнопки закрытия/открытия
+-- Логика кнопки Wellon CLOSE / OPEN
 TopBtn.MouseButton1Click:Connect(function()
     Main.Visible = not Main.Visible
     TopBtn.Text = Main.Visible and "Wellon CLOSE" or "Wellon OPEN"
