@@ -1,5 +1,5 @@
 -- // Made by @Flames9925 | Edited by @NyxaSylph
--- // Rebranded to Wellon
+-- // Wellon Hub Official Loader
 
 local cloneref = (cloneref or clonereference or function(instance)
     return instance
@@ -18,40 +18,36 @@ LPlayer.Idled:Connect(function()
     end)
 end)
 
-local Loader = {}
+local Wellon = {}
 
-Loader.Name = "Wellon"
-
-Loader.Files = {
+Wellon.Files = {
     ["Bizzare Lineage"] = {
         File = "BA/Main.lua",
         CreatorId = 33161040
     },
-
     ["A Universal Time"] = {
         File = "AUT/Main.lua",
         CreatorId = 6556072
     },
-
     ["Sailor Piece"] = {
         File = "SP/Main.lua",
         CreatorId = 1002185259
     }
 }
 
-function Loader:LoadByCreatorId(CreatorId)
+function Wellon:LoadByCreatorId(CreatorId)
     for GameName, Data in pairs(self.Files) do
         if Data.CreatorId == CreatorId then
-
-            -- ТВОЙ GITHUB REPO
-            local Url = "https://raw.githubusercontent.com/Redoxin42-bot/Rendero/main/" .. Data.File
-
+            
+            -- Ссылка теперь ведет на твой репозиторий Rendero
+            local Url = "https://raw.githubusercontent.com/Redoxin42-bit/Rendero/main/" .. Data.File
+            
             local Success, Result = pcall(function()
                 return loadstring(game:HttpGet(Url))()
             end)
 
             if Success then
-                print("✅ Wellon Loaded:", GameName)
+                print("✅ Wellon Hub Loaded:", GameName)
             else
                 warn("❌ Wellon Load failed:", Result)
             end
@@ -60,9 +56,8 @@ function Loader:LoadByCreatorId(CreatorId)
         end
     end
 
-    warn("❌ UNSUPPORTED GAME 🤡")
+    warn("WELLON HUB: UNSUPPORTED GAME 🤡")
 end
 
-Loader:LoadByCreatorId(game.CreatorId)
-
-return Loader
+Wellon:LoadByCreatorId(game.CreatorId)
+return Wellon
