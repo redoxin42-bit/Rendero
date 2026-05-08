@@ -1,116 +1,107 @@
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
-local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 local VIM = game:GetService("VirtualInputManager")
 
 local ScreenGui = Instance.new("ScreenGui", Player.PlayerGui)
-ScreenGui.Name = "WellonPremium"
+ScreenGui.Name = "Wellonh_Menu"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 999
 
--- 1. КНОПКА ОТКРЫТИЯ (Bizarre Lineage)
-local Island = Instance.new("TextButton", ScreenGui)
-Island.Size = UDim2.new(0, 160, 0, 28)
-Island.Position = UDim2.new(0.5, -80, 0, -2) -- Выше некуда
-Island.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-Island.BackgroundTransparency = 0.5
-Island.Text = "Bizarre Lineage"
-Island.TextColor3 = Color3.fromRGB(255, 255, 255)
-Island.Font = Enum.Font.GothamBold
-Island.TextSize = 12
-Instance.new("UICorner", Island).CornerRadius = UDim.new(0, 8)
-Instance.new("UIStroke", Island).Color = Color3.fromRGB(255, 90, 25)
+-- 1. КРУГЛАЯ ИКОНКА (Wellonh)
+local Icon = Instance.new("TextButton", ScreenGui)
+Icon.Size = UDim2.new(0, 55, 0, 55)
+Icon.Position = UDim2.new(0, 20, 0.5, -27)
+Icon.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Icon.Text = "Wellonh"
+Icon.TextColor3 = Color3.fromRGB(255, 90, 25)
+Icon.Font = Enum.Font.GothamBold
+Icon.TextSize = 10
+Icon.ClipsDescendants = true
+Instance.new("UICorner", Icon).CornerRadius = UDim.new(1, 0)
+local Stroke = Instance.new("UIStroke", Icon)
+Stroke.Color = Color3.fromRGB(255, 255, 255)
+Stroke.Thickness = 1.5
 
--- 2. ОСНОВНОЕ МЕНЮ
+-- Перетаскивание иконки
+local drag, dStart, sPos
+Icon.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = true dStart = i.Position sPos = Icon.Position end end)
+UIS.InputChanged:Connect(function(i) if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then local delta = i.Position - dStart Icon.Position = UDim2.new(sPos.X.Scale, sPos.X.Offset + delta.X, sPos.Y.Scale, sPos.Y.Offset + delta.Y) end end)
+UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = false end end)
+
+-- 2. ГЛАВНОЕ МЕНЮ (Стиль TikTok)
 local Main = Instance.new("Frame", ScreenGui)
 Main.Visible = false
-Main.Size = UDim2.new(0, 500, 0, 350)
-Main.Position = UDim2.new(0.5, -250, 0.5, -175)
-Main.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-Instance.new("UICorner", Main)
+Main.Size = UDim2.new(0, 480, 0, 320)
+Main.Position = UDim2.new(0.5, -240, 0.5, -160)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 17)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
 
--- Сайдбар (Слева)
-local Sidebar = Instance.new("Frame", Main)
-Sidebar.Size = UDim2.new(0, 120, 1, -10)
-Sidebar.Position = UDim2.new(0, 5, 0, 5)
-Sidebar.BackgroundTransparency = 1
-local SidebarLayout = Instance.new("UIListLayout", Sidebar)
-SidebarLayout.Padding = UDim.new(0, 5)
+-- Сайдбар
+local Tabs = Instance.new("Frame", Main)
+Tabs.Size = UDim2.new(0, 120, 1, 0)
+Tabs.BackgroundColor3 = Color3.fromRGB(20, 20, 22)
+Instance.new("UICorner", Tabs).CornerRadius = UDim.new(0, 10)
 
--- Контейнер для функций (Справа)
-local Container = Instance.new("ScrollingFrame", Main)
-Container.Size = UDim2.new(1, -135, 1, -20)
-Container.Position = UDim2.new(0, 130, 0, 10)
-Container.BackgroundTransparency = 1
-Container.CanvasSize = UDim2.new(0, 0, 2, 0)
-local ContentLayout = Instance.new("UIListLayout", Container)
-ContentLayout.Padding = UDim.new(0, 8)
+local TabList = Instance.new("UIListLayout", Tabs)
+TabList.Padding = UDim.new(0, 5)
+TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Функция создания вкладок
-local function CreateTab(name)
-    local b = Instance.new("TextButton", Sidebar)
-    b.Size = UDim2.new(1, 0, 0, 35)
-    b.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-    b.Text = name
-    b.TextColor3 = Color3.fromRGB(200, 200, 200)
-    b.Font = Enum.Font.GothamBold
-    Instance.new("UICorner", b)
-    return b
-end
+-- Контейнер для функций
+local Content = Instance.new("ScrollingFrame", Main)
+Content.Size = UDim2.new(1, -130, 1, -20)
+Content.Position = UDim2.new(0, 125, 0, 10)
+Content.BackgroundTransparency = 1
+Content.ScrollBarThickness = 0
+local ContentList = Instance.new("UIListLayout", Content)
+ContentList.Padding = UDim.new(0, 10)
 
--- Функция добавления кнопок (Toggle)
-local function AddToggle(name, callback)
-    local t = Instance.new("TextButton", Container)
-    t.Size = UDim2.new(1, -10, 0, 40)
-    t.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-    t.Text = "[ OFF ] " .. name
-    t.TextColor3 = Color3.fromRGB(255, 255, 255)
-    t.Font = Enum.Font.Gotham
-    Instance.new("UICorner", t)
+-- ФУНКЦИИ ВЫЛЕТОВ (Dropdown)
+local function Dropdown(name, options, callback)
+    local dropFrame = Instance.new("Frame", Content)
+    dropFrame.Size = UDim2.new(1, -10, 0, 35)
+    dropFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 27)
+    Instance.new("UICorner", dropFrame)
     
-    local enabled = false
-    t.MouseButton1Click:Connect(function()
-        enabled = not enabled
-        t.Text = enabled and "[ ON ] " .. name or "[ OFF ] " .. name
-        t.TextColor3 = enabled and Color3.fromRGB(255, 90, 25) or Color3.fromRGB(255, 255, 255)
-        callback(enabled)
+    local label = Instance.new("TextButton", dropFrame)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Text = "  " .. name .. " >"
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local open = false
+    label.MouseButton1Click:Connect(function()
+        open = not open
+        dropFrame.Size = open and UDim2.new(1, -10, 0, 35 + (#options * 30)) or UDim2.new(1, -10, 0, 35)
+        for _, opt in pairs(dropFrame:GetChildren()) do
+            if opt:IsA("TextButton") and opt ~= label then opt.Visible = open end
+        end
     end)
+
+    for i, optName in ipairs(options) do
+        local optBtn = Instance.new("TextButton", dropFrame)
+        optBtn.Size = UDim2.new(1, -20, 0, 25)
+        optBtn.Position = UDim2.new(0, 10, 0, 35 + (i-1)*30)
+        optBtn.Visible = false
+        optBtn.Text = optName
+        optBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 37)
+        optBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+        Instance.new("UICorner", optBtn)
+        optBtn.MouseButton1Click:Connect(function() callback(optName) end)
+    end
 end
 
--- --- ЛОГИКА ВКЛАДОК ---
+-- --- НАПОЛНЕНИЕ ---
 
--- [ RAID ]
-local RaidTab = CreateTab("Raid")
-RaidTab.MouseButton1Click:Connect(function()
-    for _, v in pairs(Container:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
-    AddToggle("Play Again (Raid)", function(v) _G.PlayAgain = v end)
-    AddToggle("Auto Raid (UnderMap)", function(v) _G.UnderRaid = v end)
-    AddToggle("Auto Raid (Above)", function(v) _G.AboveRaid = v end)
+-- Категория RAID
+Dropdown("Raid Select", {"Jotaro", "DIO", "Pucci", "Diavolo", "Kira"}, function(val)
+    print("Auto Raid started for: " .. val)
 end)
 
--- [ AUTO ]
-local AutoTab = CreateTab("Auto")
-AutoTab.MouseButton1Click:Connect(function()
-    for _, v in pairs(Container:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
-    AddToggle("Auto Skills (R, Z, X, C, V)", function(v) _G.AutoSkills = v end)
-    AddToggle("Auto Quest", function(v) _G.AutoQuest = v end)
-    AddToggle("Auto Box & Arrows", function(v) _G.AutoLoot = v end)
+-- Категория AUTO SKILLS (с выбором кнопок)
+Dropdown("Select Skills", {"R", "Z", "X", "C", "V", "E"}, function(key)
+    print("Skill toggled: " .. key)
 end)
 
--- [ MODE ]
-local ModeTab = CreateTab("Mode")
-ModeTab.MouseButton1Click:Connect(function()
-    for _, v in pairs(Container:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
-    AddToggle("GodMode (Invis)", function(v) _G.God = v end)
-    AddToggle("Fly (Risk)", function(v) _G.Fly = v end)
-end)
-
--- [ PVP ]
-local PvpTab = CreateTab("PvP")
-PvpTab.MouseButton1Click:Connect(function()
-    for _, v in pairs(Container:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
-    AddToggle("Reach (Long Attack)", function(v) _G.Reach = v end)
-    AddToggle("No Stun", function(v) _G.NoStun = v end)
-end)
-
-Island.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
+-- Переключатель
+Icon.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
