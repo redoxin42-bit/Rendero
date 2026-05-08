@@ -1,18 +1,28 @@
-local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
+-- // Wellon Hub | Private Version
+-- // Made for redoxin42-bit
+
+local cloneref = (cloneref or clonereference or function(instance) return instance end)
+local Players = cloneref(game:GetService("Players"))
 local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
+local LPlayer = Players.LocalPlayer
 
--- Удаляем старые версии, если они есть
-if game:GetService("CoreGui"):FindFirstChild("WellonHub") then
-    game:GetService("CoreGui").WellonHub:Destroy()
-end
+repeat task.wait() until game:IsLoaded() and LPlayer
 
+-- 1. АНТИ-АФК (Как в оригинале)
+LPlayer.Idled:Connect(function()
+    pcall(function()
+        local VirtualUser = game:GetService("VirtualUser")
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end)
+end)
+
+-- 2. ИНТЕРФЕЙС (Wellon Style)
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 ScreenGui.Name = "WellonHub"
 
--- Функция перетаскивания
-local function MakeDraggable(obj)
+-- Функция перетаскивания (Draggable)
+local function Drag(obj)
     local dragging, dragInput, dragStart, startPos
     obj.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -28,127 +38,132 @@ local function MakeDraggable(obj)
     end)
 end
 
--- 1. ВЕРХНЯЯ КНОПКА (Wellon CLOSE)
-local TopToggle = Instance.new("Frame", ScreenGui)
-TopToggle.Size = UDim2.new(0, 140, 0, 32)
-TopToggle.Position = UDim2.new(0.5, -70, 0, 15)
-TopToggle.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-Instance.new("UICorner", TopToggle).CornerRadius = UDim.new(0, 6)
-local TopStroke = Instance.new("UIStroke", TopToggle)
-TopStroke.Color = Color3.fromRGB(70, 70, 90)
-MakeDraggable(TopToggle)
+-- Верхняя кнопка управления (Wellon CLOSE)
+local TopBar = Instance.new("Frame", ScreenGui)
+TopBar.Size = UDim2.new(0, 150, 0, 35)
+TopBar.Position = UDim2.new(0.5, -75, 0, 15)
+TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 8)
+local Stroke = Instance.new("UIStroke", TopBar)
+Stroke.Color = Color3.fromRGB(85, 55, 160) -- Фиолетовый акцент
+Drag(TopBar)
 
-local TopBtn = Instance.new("TextButton", TopToggle)
+local TopBtn = Instance.new("TextButton", TopBar)
 TopBtn.Size = UDim2.new(1, 0, 1, 0)
 TopBtn.BackgroundTransparency = 1
 TopBtn.Text = "Wellon CLOSE"
 TopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 TopBtn.Font = Enum.Font.GothamBold
-TopBtn.TextSize = 12
+TopBtn.TextSize = 13
 
--- 2. ГЛАВНОЕ МЕНЮ
+-- Главное Окно
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0, 620, 0, 390)
-Main.Position = UDim2.new(0.5, -310, 0.5, -195)
+Main.Size = UDim2.new(0, 600, 0, 380)
+Main.Position = UDim2.new(0.5, -300, 0.5, -190)
 Main.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
-MakeDraggable(Main)
+Drag(Main)
 
--- Левый сайдбар (как на скрине)
+-- Сайдбар с иконками
 local Sidebar = Instance.new("Frame", Main)
 Sidebar.Size = UDim2.new(0, 60, 1, 0)
-Sidebar.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+Sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 Instance.new("UICorner", Sidebar)
 
-local SidebarList = Instance.new("UIListLayout", Sidebar)
-SidebarList.Padding = UDim.new(0, 20)
-SidebarList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+local SidebarIcons = Instance.new("UIListLayout", Sidebar)
+SidebarIcons.Padding = UDim.new(0, 15)
+SidebarIcons.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Заголовок игры (Справа сверху)
-local GameTag = Instance.new("TextLabel", Main)
-GameTag.Size = UDim2.new(0, 120, 0, 25)
-GameTag.Position = UDim2.new(1, -135, 0, 10)
-GameTag.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-GameTag.Text = "Bizarre Lineage"
-GameTag.TextColor3 = Color3.fromRGB(180, 180, 180)
-GameTag.Font = Enum.Font.Gotham
-Instance.new("UICorner", GameTag)
-
--- Область для функций
+-- Область контента
 local Scroll = Instance.new("ScrollingFrame", Main)
 Scroll.Size = UDim2.new(1, -90, 1, -80)
-Scroll.Position = UDim2.new(0, 75, 0, 45)
+Scroll.Position = UDim2.new(0, 80, 0, 50)
 Scroll.BackgroundTransparency = 1
 Scroll.ScrollBarThickness = 2
 local List = Instance.new("UIListLayout", Scroll)
 List.Padding = UDim.new(0, 10)
 
--- Функция создания раздела (Changelog / Automation)
-local function AddSection(name, items)
-    local Sec = Instance.new("Frame", Scroll)
-    Sec.Size = UDim2.new(1, -10, 0, 40)
-    Sec.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
-    Sec.ClipsDescendants = true
-    Instance.new("UICorner", Sec)
+-- 3. ЛОГИКА ЗАГРУЗЧИКА И ФУНКЦИЙ
+local CurrentGame = "Unsupported"
+if game.CreatorId == 33161040 then CurrentGame = "Bizarre Lineage"
+elseif game.CreatorId == 6556072 then CurrentGame = "A Universal Time"
+elseif game.CreatorId == 1002185259 then CurrentGame = "Sailor Piece" end
 
-    local Header = Instance.new("TextButton", Sec)
-    Header.Size = UDim2.new(1, 0, 0, 40)
-    Header.BackgroundTransparency = 1
-    Header.Text = "  " .. name .. "  ▼"
-    Header.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Header.TextXAlignment = Enum.TextXAlignment.Left
-    Header.Font = Enum.Font.GothamBold
+-- Заголовок игры сверху справа
+local GameTitle = Instance.new("TextLabel", Main)
+GameTitle.Size = UDim2.new(0, 150, 0, 30)
+GameTitle.Position = UDim2.new(1, -160, 0, 10)
+GameTitle.Text = CurrentGame
+GameTitle.TextColor3 = Color3.fromRGB(150, 150, 170)
+GameTitle.BackgroundTransparency = 1
+GameTitle.Font = Enum.Font.Gotham
+GameTitle.TextXAlignment = Enum.TextXAlignment.Right
 
-    local Open = false
-    Header.MouseButton1Click:Connect(function()
-        Open = not Open
-        Sec:TweenSize(Open and UDim2.new(1, -10, 0, 40 + (#items * 35)) or UDim2.new(1, -10, 0, 40), "Out", "Quad", 0.3, true)
+-- ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ КНОПОК (Toggles)
+local function AddToggle(name, callback)
+    local Frame = Instance.new("Frame", Scroll)
+    Frame.Size = UDim2.new(1, -10, 0, 40)
+    Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+    Instance.new("UICorner", Frame)
+
+    local L = Instance.new("TextLabel", Frame)
+    L.Size = UDim2.new(0.7, 0, 1, 0)
+    L.Position = UDim2.new(0, 15, 0, 0)
+    L.Text = name
+    L.TextColor3 = Color3.fromRGB(200, 200, 210)
+    L.BackgroundTransparency = 1
+    L.TextXAlignment = Enum.TextXAlignment.Left
+    L.Font = Enum.Font.Gotham
+
+    local T = Instance.new("TextButton", Frame)
+    T.Size = UDim2.new(0, 40, 0, 20)
+    T.Position = UDim2.new(0.85, 0, 0.25, 0)
+    T.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+    T.Text = ""
+    Instance.new("UICorner", T).CornerRadius = UDim.new(1, 0)
+
+    local state = false
+    T.MouseButton1Click:Connect(function()
+        state = not state
+        T.BackgroundColor3 = state and Color3.fromRGB(85, 55, 160) or Color3.fromRGB(45, 45, 55)
+        callback(state)
     end)
-
-    for i, txt in ipairs(items) do
-        local Row = Instance.new("Frame", Sec)
-        Row.Size = UDim2.new(1, -10, 0, 30)
-        Row.Position = UDim2.new(0, 5, 0, 40 + (i-1)*35)
-        Row.BackgroundTransparency = 1
-        
-        local L = Instance.new("TextLabel", Row)
-        L.Size = UDim2.new(0.8, 0, 1, 0)
-        L.Text = txt
-        L.TextColor3 = Color3.fromRGB(180, 180, 180)
-        L.BackgroundTransparency = 1
-        L.TextXAlignment = Enum.TextXAlignment.Left
-
-        local T = Instance.new("TextButton", Row)
-        T.Size = UDim2.new(0, 35, 0, 18)
-        T.Position = UDim2.new(0.85, 0, 0.2, 0)
-        T.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-        Instance.new("UICorner", T).CornerRadius = UDim.new(1, 0)
-        
-        local On = false
-        T.MouseButton1Click:Connect(function()
-            On = not On
-            T.BackgroundColor3 = On and Color3.fromRGB(80, 50, 150) or Color3.fromRGB(45, 45, 55)
-        end)
-    end
 end
 
--- Наполняем точно как на твоих скринах
-AddSection("Changelog", {"[+] Added Auto Farm", "[+] Improved UI", "[+] Added ESP"})
-AddSection("Automation", {"Auto Mission", "Auto Meditation", "Auto Prestige"})
-AddSection("Player ESP", {"Enable ESP", "Healthbar", "Boxes", "Distance"})
+-- 4. НАПОЛНЕНИЕ (РАБОЧИЕ ФУНКЦИИ)
+if CurrentGame == "Bizarre Lineage" then
+    AddToggle("Auto Farm Mission", function(v) 
+        _G.AutoFarm = v
+        while _G.AutoFarm do
+            pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.Communicate:FireServer("AcceptMission")
+            end)
+            task.wait(1)
+        end
+    end)
+    AddToggle("Auto Meditation", function(v)
+        _G.Meditation = v
+        while _G.Meditation do
+            pcall(function() game:GetService("ReplicatedStorage").Remotes.Meditation:FireServer(true) end)
+            task.wait(0.5)
+        end
+    end)
+end
 
--- Нижняя плашка (Wellon | Build 2.0 | FPS)
-local Bottom = Instance.new("TextLabel", Main)
-Bottom.Size = UDim2.new(0, 200, 0, 20)
-Bottom.Position = UDim2.new(1, -210, 1, -25)
-Bottom.Text = "Wellon | Build 2.0 | 60 FPS"
-Bottom.TextColor3 = Color3.fromRGB(100, 100, 120)
-Bottom.BackgroundTransparency = 1
-Bottom.Font = Enum.Font.Gotham
-Bottom.TextXAlignment = Enum.TextXAlignment.Right
+-- Нижняя плашка
+local Info = Instance.new("TextLabel", Main)
+Info.Size = UDim2.new(0, 200, 0, 20)
+Info.Position = UDim2.new(1, -210, 1, -25)
+Info.Text = "Wellon | Build 2.0 | FPS: 60"
+Info.TextColor3 = Color3.fromRGB(80, 80, 100)
+Info.BackgroundTransparency = 1
+Info.Font = Enum.Font.Gotham
+Info.TextXAlignment = Enum.TextXAlignment.Right
 
--- Логика кнопки закрытия
+-- Логика CLOSE / OPEN
 TopBtn.MouseButton1Click:Connect(function()
     Main.Visible = not Main.Visible
     TopBtn.Text = Main.Visible and "Wellon CLOSE" or "Wellon OPEN"
 end)
+
+print("✅ Wellon Hub успешно загружен!")
